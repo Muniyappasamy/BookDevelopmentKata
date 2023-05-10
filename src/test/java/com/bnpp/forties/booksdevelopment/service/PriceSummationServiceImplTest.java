@@ -43,8 +43,8 @@ public class PriceSummationServiceImplTest {
         assertEquals(2*BOOK_PRICE, actualPrice);
     }
     @Test
-    @DisplayName("500 should return for a Five book")
-    void priceForFiveBooks_shouldReturnFiveHundrad() {
+    @DisplayName("250 should return for a Five book")
+    void priceForFiveBooks_shouldReturnTwoHundradAndFivty() {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",5);
         books.add(bookDto);
@@ -52,4 +52,5 @@ public class PriceSummationServiceImplTest {
 
         assertEquals(5*BOOK_PRICE, actualPrice);
     }
+
 }
