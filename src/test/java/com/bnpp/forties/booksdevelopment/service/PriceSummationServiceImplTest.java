@@ -85,4 +85,45 @@ public class PriceSummationServiceImplTest {
         assertEquals(expectedPrice, actualPrice);
     }
 
+    @Test
+    @DisplayName("Four different books should get 10% discount")
+    void priceForFourDifferentBooks_shouldReturnOneHundradAndSixty() {
+        double expectedPrice = 160.00;
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Clean Code",1);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",1);
+        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+        books.add(bookDto4);
+
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedPrice, actualPrice);
+    }
+
+    @Test
+    @DisplayName("Five different books should get 10% discount")
+    void priceForFiveDifferentBooks_shouldReturnOneHundradAndEightySeven() {
+        double expectedPrice = 187.50;
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Clean Code",1);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",1);
+        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
+        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
+
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+        books.add(bookDto4);
+        books.add(bookDto5);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedPrice, actualPrice);
+    }
+
+
 }
