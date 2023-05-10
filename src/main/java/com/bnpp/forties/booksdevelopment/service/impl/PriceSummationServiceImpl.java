@@ -20,7 +20,11 @@ public class PriceSummationServiceImpl implements PriceSummationService {
         Map<String, Integer> listOfBooksWithQuantityMap = books.stream()
                 .collect(Collectors.toMap(BookDto::getName, BookDto::getQuantity));
         Set<String> uniqueBooks = listOfBooksWithQuantityMap.keySet();
+        long distinctBooks = books.stream().map(BookDto::getName).distinct().count();
+        int discountPercentage = (distinctBooks == 2) ? 5 : 0;
         double actualPrice = uniqueBooks.stream().mapToDouble(bookName -> bookTitlePriceMap.get(bookName) * listOfBooksWithQuantityMap.get(bookName)).sum();
-        return actualPrice;
+        double discountedPrice = (actualPrice * discountPercentage) / 100;
+
+        return actualPrice-discountedPrice;
     }
 }
