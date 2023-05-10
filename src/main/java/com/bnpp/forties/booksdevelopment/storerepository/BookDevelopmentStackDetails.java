@@ -1,5 +1,10 @@
 package com.bnpp.forties.booksdevelopment.storerepository;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum BookDevelopmentStackDetails {
 
     CLEAN_CODE("Clean Code", "Robert Martin", 50.00),
@@ -12,33 +17,4 @@ public enum BookDevelopmentStackDetails {
     private String author;
     private double price;
 
-    BookDevelopmentStackDetails(String bookTitle, String author, double price) {
-        this.bookTitle = bookTitle;
-        this.author = author;
-        this.price = price;
-    }
-
-    public String getBookTitle() {
-        return bookTitle;
-    }
-
-    public void setBookTitle(String bookTitle) {
-        this.bookTitle = bookTitle;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
 }
