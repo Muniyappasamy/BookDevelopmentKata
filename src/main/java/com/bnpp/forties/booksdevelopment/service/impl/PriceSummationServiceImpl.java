@@ -13,6 +13,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class PriceSummationServiceImpl implements PriceSummationService {
+
+
+    private static final int TWO = 2;
+    private static final int FIVE = 5;
+    private static final int TEN = 10;
+    private static final int ZERO = 0;
+    private static final int THREE = 3;
+
+
+    private static final int HUNDRAD = 100;
+
     @Override
     public Double calculatePrice(List<BookDto> books) {
         Map<String, Double> bookTitlePriceMap = Arrays.stream(BookDevelopmentStackDetails.values())
@@ -21,12 +32,12 @@ public class PriceSummationServiceImpl implements PriceSummationService {
                 .collect(Collectors.toMap(BookDto::getName, BookDto::getQuantity));
         Set<String> uniqueBooks = listOfBooksWithQuantityMap.keySet();
         long distinctBooks = books.stream().map(BookDto::getName).distinct().count();
-        int discountPercentage = (distinctBooks == 2) ? 5 : 0;
-        discountPercentage = (distinctBooks == 3) ? 10 : discountPercentage;
+        int discountPercentage = (distinctBooks == TWO) ? FIVE : ZERO;
+        discountPercentage = (distinctBooks == THREE) ? TEN : discountPercentage;
 
         double actualPrice = uniqueBooks.stream().mapToDouble(bookName -> bookTitlePriceMap.get(bookName) * listOfBooksWithQuantityMap.get(bookName)).sum();
-        double discountedPrice = (actualPrice * discountPercentage) / 100;
+        double discountedPrice = (actualPrice * discountPercentage) / HUNDRAD;
 
-        return actualPrice-discountedPrice;
+        return actualPrice - discountedPrice;
     }
 }

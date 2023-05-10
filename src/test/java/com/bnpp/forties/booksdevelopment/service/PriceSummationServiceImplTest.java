@@ -18,6 +18,8 @@ public class PriceSummationServiceImplTest {
     private static final String BOOK_NAME = "Clean Code";
     private static final double BOOK_PRICE = 50.00;
 
+
+
     @Autowired
     private PriceSummationServiceImpl priceSummationServiceImpl;
 
