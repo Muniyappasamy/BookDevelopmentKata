@@ -31,4 +31,25 @@ public class PriceSummationServiceImplTest {
 
         assertEquals(BOOK_PRICE, actualPrice);
     }
+
+    @Test
+    @DisplayName("100 should return for a two book")
+    void priceForTwoBooks_shouldReturnHundrad() {
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto = new BookDto("Clean Code",2);
+        books.add(bookDto);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(2*BOOK_PRICE, actualPrice);
+    }
+    @Test
+    @DisplayName("500 should return for a Five book")
+    void priceForFiveBooks_shouldReturnFiveHundrad() {
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto = new BookDto("Clean Code",5);
+        books.add(bookDto);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(5*BOOK_PRICE, actualPrice);
+    }
 }
