@@ -67,4 +67,20 @@ public class PriceSummationServiceImplTest {
         assertEquals(expectedPrice, actualPrice);
     }
 
+    @Test
+    @DisplayName("Three different books should get 10% discount")
+    void priceForThreeDifferentBooks_shouldReturnOneHundradAndThirtyFive() {
+        double expectedPrice = 135.00;
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Clean Code",1);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",1);
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedPrice, actualPrice);
+    }
+
 }
