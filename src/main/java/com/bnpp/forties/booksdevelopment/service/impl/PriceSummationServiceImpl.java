@@ -3,26 +3,20 @@ package com.bnpp.forties.booksdevelopment.service.impl;
 import com.bnpp.forties.booksdevelopment.model.BookDto;
 import com.bnpp.forties.booksdevelopment.service.PriceSummationService;
 import com.bnpp.forties.booksdevelopment.storerepository.BookDevelopmentStackDetails;
+import com.bnpp.forties.booksdevelopment.storerepository.DiscountDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class PriceSummationServiceImpl implements PriceSummationService {
 
 
-    private static final int TWO = 2;
-    private static final int FIVE = 5;
-    private static final int TEN = 10;
-    private static final int ZERO = 0;
-    private static final int THREE = 3;
+    private static final int ZERO_PERCENT = 0;
 
 
-    private static final int HUNDRAD = 100;
+    private static final int HUNDRED = 100;
 
     @Override
     public Double calculatePrice(List<BookDto> books) {
@@ -32,12 +26,17 @@ public class PriceSummationServiceImpl implements PriceSummationService {
                 .collect(Collectors.toMap(BookDto::getName, BookDto::getQuantity));
         Set<String> uniqueBooks = listOfBooksWithQuantityMap.keySet();
         long distinctBooks = books.stream().map(BookDto::getName).distinct().count();
-        int discountPercentage = (distinctBooks == TWO) ? FIVE : ZERO;
-        discountPercentage = (distinctBooks == THREE) ? TEN : discountPercentage;
 
         double actualPrice = uniqueBooks.stream().mapToDouble(bookName -> bookTitlePriceMap.get(bookName) * listOfBooksWithQuantityMap.get(bookName)).sum();
-        double discountedPrice = (actualPrice * discountPercentage) / HUNDRAD;
+        double discountedPrice = (actualPrice * getDiscountPercentage(distinctBooks)) / HUNDRED;
 
         return actualPrice - discountedPrice;
+    }
+
+    private int getDiscountPercentage(long numberOfDistinctItems) {
+        Optional<DiscountDetails> discount = Arrays.stream(DiscountDetails.values())
+                .sorted(Comparator.reverseOrder())
+                .filter(discountGroup -> discountGroup.getNumberOfDistinctItems() <= numberOfDistinctItems).findFirst();
+        return (discount.isPresent()) ? discount.get().getDiscountPercentage() : ZERO_PERCENT;
     }
 }
