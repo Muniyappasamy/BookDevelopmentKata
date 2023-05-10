@@ -1,6 +1,7 @@
 package com.bnpp.forties.booksdevelopment.service;
 
 import com.bnpp.forties.booksdevelopment.model.BookDto;
+import com.bnpp.forties.booksdevelopment.service.impl.PriceSummationServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class PriceSummationServiceTest {
+public class PriceSummationServiceImplTest {
 
     private static final String BOOK_NAME = "Clean Code";
     private static final double BOOK_PRICE = 50.00;
 
     @Autowired
-    private PriceSummationService priceSummationService;
+    private PriceSummationServiceImpl priceSummationServiceImpl;
 
     @Test
     @DisplayName("50 should return for a single book")
@@ -26,7 +27,7 @@ public class PriceSummationServiceTest {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",1);
         books.add(bookDto);
-        Double actualPrice = priceSummationService.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
 
         assertEquals(BOOK_PRICE, actualPrice);
     }
