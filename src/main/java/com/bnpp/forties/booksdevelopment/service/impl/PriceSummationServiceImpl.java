@@ -24,10 +24,10 @@ public class PriceSummationServiceImpl implements PriceSummationService {
     private static final int HUNDRED = 100;
 
     @Override
-    public CartSummaryReportDto calculatePrice(List<BookDto> books) {
+    public CartSummaryReportDto getcartSummaryReport(List<BookDto> books) {
         Map<String, Integer> listOfBooksWithQuantityMap = books.stream()
                 .collect(Collectors.toMap(BookDto::getName, BookDto::getQuantity));
-        List<BookGroupClassification> listOfBookGroup = getListOfBookGroupDiscount(listOfBooksWithQuantityMap, new ArrayList<>());
+        List<BookGroupClassification> listOfBookGroup = getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, new ArrayList<>());
         BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(listOfBooksWithQuantityMap);
         listOfBookGroup.add(booksWithoutDiscount);
         double actualPrice = listOfBookGroup.stream().mapToDouble(BookGroupClassification::getActualPrice).sum();
@@ -39,7 +39,7 @@ public class PriceSummationServiceImpl implements PriceSummationService {
         cartSummaryReportDto.setBestPrice(actualPrice - discount);
         return cartSummaryReportDto;
     }
-    private List<BookGroupClassification> getListOfBookGroupDiscount(Map<String, Integer> listOfBooksWithQuantityMap,
+    private List<BookGroupClassification> getListOfBookGroupWithDiscount(Map<String, Integer> listOfBooksWithQuantityMap,
                                                                      List<BookGroupClassification> bookGroupClassificationList) {
         Optional<DiscountDetails> discount = getDiscount(listOfBooksWithQuantityMap.size());
         if (discount.isPresent()) {
@@ -49,7 +49,7 @@ public class PriceSummationServiceImpl implements PriceSummationService {
             BookGroupClassification currentBookGroup = getBookGroup(listOfDistinctBooks);
             bookGroupClassificationList.add(currentBookGroup);
             removeDiscountedBooks(listOfBooksWithQuantityMap, listOfDistinctBooks);
-            getListOfBookGroupDiscount(listOfBooksWithQuantityMap, bookGroupClassificationList);
+            getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, bookGroupClassificationList);
         }
         return bookGroupClassificationList;
     }

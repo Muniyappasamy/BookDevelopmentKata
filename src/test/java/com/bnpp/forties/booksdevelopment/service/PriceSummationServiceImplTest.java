@@ -30,7 +30,7 @@ public class PriceSummationServiceImplTest {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",1);
         books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(BOOK_PRICE, actualPrice);
@@ -42,7 +42,7 @@ public class PriceSummationServiceImplTest {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",2);
         books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(2*BOOK_PRICE, actualPrice);
@@ -53,7 +53,7 @@ public class PriceSummationServiceImplTest {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",5);
         books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(5*BOOK_PRICE, actualPrice);
@@ -68,7 +68,7 @@ public class PriceSummationServiceImplTest {
         BookDto bookDto2 = new BookDto("The Clean Coder",1);
         books.add(bookDto1);
         books.add(bookDto2);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedPrice, actualPrice);
@@ -85,7 +85,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto1);
         books.add(bookDto2);
         books.add(bookDto3);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedPrice, actualPrice);
@@ -105,7 +105,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto3);
         books.add(bookDto4);
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedPrice, actualPrice);
@@ -127,7 +127,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto3);
         books.add(bookDto4);
         books.add(bookDto5);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedPrice, actualPrice);
@@ -145,7 +145,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto2);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedResultThreeBooksWithTwoDistinctBooks, actualPrice);
@@ -166,7 +166,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto3);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedResultFourBooksWithThreeDistinctBooks, actualPrice);
@@ -190,7 +190,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto4);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedResultFiveBooksWithFourDistinctBooks, actualPrice);
@@ -218,7 +218,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto5);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 ;
 
         assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
@@ -243,7 +243,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto5);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
 
         assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
     }
@@ -269,7 +269,7 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto5);
 
 
-        CartSummaryReportDto cartSummaryReportDto = priceSummationServiceImpl.calculatePrice(books);
+        CartSummaryReportDto cartSummaryReportDto = priceSummationServiceImpl.getcartSummaryReport(books);
 
         assertEquals(expectedActualPrice, cartSummaryReportDto.getActualPrice());
         assertEquals(expectedDiscountPrice, cartSummaryReportDto.getTotalDiscount());

@@ -8,5 +8,5 @@ import java.util.List;
 
 @Service
 public interface PriceSummationService {
-    public CartSummaryReportDto calculatePrice(List<BookDto> books);
+    public CartSummaryReportDto getcartSummaryReport(List<BookDto> books);
 }
