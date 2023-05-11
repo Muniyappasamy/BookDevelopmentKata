@@ -36,6 +36,13 @@ public class BooksDevelopmentController {
         return booksDevelopmentService.getAllBooks();
     }
 
+
+    @ApiOperation(value = "API Produces Calculated Book Summary Report With Best Price Of Discounts ", response = CartSummaryReportDto.class, tags = "calculateDiscountPrice")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Suceess|OK"),
+            @ApiResponse(code = 400, message = "Bad Request, Given Input is not Matching the Store Boooks!"),
+            @ApiResponse(code = 404, message = "not found!!!")
+    })
     @RequestMapping(method = RequestMethod.POST, value = APIRoutes.BooksController.CALCULATE_DISCOUNT_PRICE)
     public CartSummaryReportDto calculateDiscountPrice(@RequestBody List<BookDto> listOfBooks) {
         return priceSummationService.getcartSummaryReport(listOfBooks);
