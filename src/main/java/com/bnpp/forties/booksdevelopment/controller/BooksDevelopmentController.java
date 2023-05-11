@@ -31,7 +31,7 @@ public class BooksDevelopmentController {
             @ApiResponse(code = 200, message = "Success|OK"),
             @ApiResponse(code = 403, message = "forbidden!!!"),
             @ApiResponse(code = 404, message = "not found!!!")})
-    @RequestMapping(method = RequestMethod.GET, value = APIRoutes.BooksController.GET_ALL_BOOKS)
+    @GetMapping(value = APIRoutes.BooksController.GET_ALL_BOOKS)
     public List<Book> getAllBooks() {
         return booksDevelopmentService.getAllBooks();
     }
@@ -43,7 +43,8 @@ public class BooksDevelopmentController {
             @ApiResponse(code = 400, message = "Bad Request, Given Input is not Matching the Store Boooks!"),
             @ApiResponse(code = 404, message = "not found!!!")
     })
-    @RequestMapping(method = RequestMethod.POST, value = APIRoutes.BooksController.CALCULATE_DISCOUNT_PRICE)
+
+    @PostMapping(value= APIRoutes.BooksController.CALCULATE_DISCOUNT_PRICE)
     public CartSummaryReportDto calculateDiscountPrice(@RequestBody List<BookDto> listOfBooks) {
         return priceSummationService.getcartSummaryReport(listOfBooks);
     }
