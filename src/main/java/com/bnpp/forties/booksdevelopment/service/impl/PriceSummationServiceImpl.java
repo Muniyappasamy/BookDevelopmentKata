@@ -33,25 +33,32 @@ public class PriceSummationServiceImpl implements PriceSummationService {
         List<Integer> listOfPossibleDiscounts = getPossibleDiscountValues(listOfBooksWithQuantityMap.size());
         CartSummaryReportDto cartSummaryReportDto = new CartSummaryReportDto();
         if (CollectionUtils.isNotEmpty(listOfPossibleDiscounts)) {
-            listOfPossibleDiscounts.stream().forEach(numberOfBooksToGroup -> {
-                Map<String, Integer> listOfBooksWithQuantityMapCopy = duplicateMap(listOfBooksWithQuantityMap);
-                List<BookGroupClassification> listOfBookGroup = getListOfBookGroupWithDiscount(listOfBooksWithQuantityMapCopy, new ArrayList<>(),
-                        numberOfBooksToGroup);
-                if (!listOfBooksWithQuantityMapCopy.isEmpty()) {
-                    BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(listOfBooksWithQuantityMapCopy);
-                    listOfBookGroup.add(booksWithoutDiscount);
-                }
-                updateBestDiscount(cartSummaryReportDto, listOfBookGroup);
-            });
+            calculateAndUpdatePriceWithDiscount(listOfBooksWithQuantityMap, listOfPossibleDiscounts, cartSummaryReportDto);
         } else {
-            BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(listOfBooksWithQuantityMap);
-            List<BookGroupClassification> listOfBookGroup = new ArrayList<>();
-            listOfBookGroup.add(booksWithoutDiscount);
-            updateBestDiscount(cartSummaryReportDto, listOfBookGroup);
+            calculateAndUpdatePriceWithOutDiscount(listOfBooksWithQuantityMap, cartSummaryReportDto);
         }
         return cartSummaryReportDto;
     }
 
+
+    public void calculateAndUpdatePriceWithOutDiscount(Map<String, Integer> listOfbooksWithQuantityMap, CartSummaryReportDto priceSummaryDto) {
+        BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(listOfbooksWithQuantityMap);
+        List<BookGroupClassification> listOfBookGroupClassification = new ArrayList<>();
+        listOfBookGroupClassification.add(booksWithoutDiscount);
+        updateBestDiscount(priceSummaryDto, listOfBookGroupClassification);
+    }
+
+    public void calculateAndUpdatePriceWithDiscount(Map<String, Integer> listOfbooksWithQuantityMap, List<Integer> listOfPossibleDiscounts, CartSummaryReportDto cartSummaryReportDto) {
+        listOfPossibleDiscounts.stream().forEach(numberOfBooksToGroup -> {
+            Map<String, Integer> bookQuantityMapCopy = duplicateMap(listOfbooksWithQuantityMap);
+            List<BookGroupClassification> listOfBookGroupClassification = getListOfBookGroupWithDiscount(bookQuantityMapCopy, new ArrayList<BookGroupClassification>(), numberOfBooksToGroup);
+            if (CollectionUtils.isNotEmpty(bookQuantityMapCopy.keySet())) {
+                BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(bookQuantityMapCopy);
+                listOfBookGroupClassification.add(booksWithoutDiscount);
+            }
+            updateBestDiscount(cartSummaryReportDto, listOfBookGroupClassification);
+        });
+    }
 
     private void updateBestDiscount(CartSummaryReportDto priceSummaryDto, List<BookGroupClassification> listOfBookGroupClassification) {
         double discount = listOfBookGroupClassification.stream().mapToDouble(BookGroupClassification::getDiscount).sum();

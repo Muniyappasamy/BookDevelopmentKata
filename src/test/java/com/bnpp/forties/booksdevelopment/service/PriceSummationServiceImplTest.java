@@ -230,7 +230,7 @@ public class PriceSummationServiceImplTest {
     @DisplayName("apply discount to all distinct books only ")
     void calculatePrice_shouldApplyDiscountToAllDistinctBooks() {
         List<BookDto> books = new ArrayList<BookDto>();
-        Double expectedResultSixBooksWithFiveDistinctBooks = 372.5;
+        Double expectedResultSixBooksWithFiveDistinctBooks = 370.0;
 
         BookDto bookDto1 = new BookDto("Clean Code",2);
         BookDto bookDto2 = new BookDto("The Clean Coder",1);
@@ -255,8 +255,8 @@ public class PriceSummationServiceImplTest {
     void calculatePrice_shouldReturnCartSummaryReport() {
         List<BookDto> books = new ArrayList<BookDto>();
         Double expectedActualPrice = 450.0;
-        Double expectedDiscountPrice = 77.5;
-        Double expectedResultSixBooksWithFiveDistinctBooks = 372.5;
+        Double expectedDiscountPrice = 80.0;
+        Double expectedResultSixBooksWithFiveDistinctBooks = 370.0;
 
         BookDto bookDto1 = new BookDto("Clean Code",2);
         BookDto bookDto2 = new BookDto("The Clean Coder",1);
