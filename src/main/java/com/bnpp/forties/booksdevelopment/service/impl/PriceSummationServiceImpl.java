@@ -30,21 +30,45 @@ public class PriceSummationServiceImpl implements PriceSummationService {
         validateAllBooks(listOfBooks);
         Map<String, Integer> listOfBooksWithQuantityMap = listOfBooks.stream()
                 .collect(Collectors.toMap(BookDto::getName, BookDto::getQuantity));
-        List<BookGroupClassification> listOfBookGroup = getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, new ArrayList<>());
-        BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(listOfBooksWithQuantityMap);
-        listOfBookGroup.add(booksWithoutDiscount);
-        double actualPrice = listOfBookGroup.stream().mapToDouble(BookGroupClassification::getActualPrice).sum();
-        double discount = listOfBookGroup.stream().mapToDouble(BookGroupClassification::getDiscount).sum();
+        List<Integer> listOfPossibleDiscounts = getPossibleDiscountValues(listOfBooksWithQuantityMap.size());
         CartSummaryReportDto cartSummaryReportDto = new CartSummaryReportDto();
-        cartSummaryReportDto.setListOfBookGroupClassifications(listOfBookGroup);
-        cartSummaryReportDto.setActualPrice(actualPrice);
-        cartSummaryReportDto.setTotalDiscount(discount);
-        cartSummaryReportDto.setBestPrice(actualPrice - discount);
+        if (CollectionUtils.isNotEmpty(listOfPossibleDiscounts)) {
+            listOfPossibleDiscounts.stream().forEach(numberOfBooksToGroup -> {
+                Map<String, Integer> listOfBooksWithQuantityMapCopy = duplicateMap(listOfBooksWithQuantityMap);
+                List<BookGroupClassification> listOfBookGroup = getListOfBookGroupWithDiscount(listOfBooksWithQuantityMapCopy, new ArrayList<>(),
+                        numberOfBooksToGroup);
+                if (!listOfBooksWithQuantityMapCopy.isEmpty()) {
+                    BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(listOfBooksWithQuantityMapCopy);
+                    listOfBookGroup.add(booksWithoutDiscount);
+                }
+                updateBestDiscount(cartSummaryReportDto, listOfBookGroup);
+            });
+        } else {
+            BookGroupClassification booksWithoutDiscount = getListOfBookGroupWithoutDiscount(listOfBooksWithQuantityMap);
+            List<BookGroupClassification> listOfBookGroup = new ArrayList<>();
+            listOfBookGroup.add(booksWithoutDiscount);
+            updateBestDiscount(cartSummaryReportDto, listOfBookGroup);
+        }
         return cartSummaryReportDto;
     }
+
+
+    private void updateBestDiscount(CartSummaryReportDto priceSummaryDto, List<BookGroupClassification> listOfBookGroupClassification) {
+        double discount = listOfBookGroupClassification.stream().mapToDouble(BookGroupClassification::getDiscount).sum();
+        if (discount >= priceSummaryDto.getTotalDiscount()) {
+            priceSummaryDto.setListOfBookGroupClassifications(listOfBookGroupClassification);
+            double actualPrice = listOfBookGroupClassification.stream().mapToDouble(BookGroupClassification::getActualPrice).sum();
+            priceSummaryDto.setActualPrice(actualPrice);
+            priceSummaryDto.setTotalDiscount(discount);
+            priceSummaryDto.setBestPrice(actualPrice - discount);
+        }
+    }
     private List<BookGroupClassification> getListOfBookGroupWithDiscount(Map<String, Integer> listOfBooksWithQuantityMap,
-                                                                     List<BookGroupClassification> bookGroupClassificationList) {
-        Optional<DiscountDetails> discount = getDiscount(listOfBooksWithQuantityMap.size());
+                                                                     List<BookGroupClassification> bookGroupClassificationList, int numberOfBooksToGroup) {
+
+
+        numberOfBooksToGroup = getNumberOfBooksToGroup(listOfBooksWithQuantityMap, numberOfBooksToGroup);
+        Optional<DiscountDetails> discount = getDiscount(numberOfBooksToGroup);
         if (discount.isPresent()) {
             int bookGroupSize = discount.get().getNumberOfDistinctItems();
             List<String> listOfDistinctBooks = listOfBooksWithQuantityMap.keySet().stream().limit(bookGroupSize)
@@ -52,9 +76,18 @@ public class PriceSummationServiceImpl implements PriceSummationService {
             BookGroupClassification currentBookGroup = getBookGroup(listOfDistinctBooks);
             bookGroupClassificationList.add(currentBookGroup);
             removeDiscountedBooks(listOfBooksWithQuantityMap, listOfDistinctBooks);
-            getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, bookGroupClassificationList);
+            getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, bookGroupClassificationList,numberOfBooksToGroup);
         }
         return bookGroupClassificationList;
+    }
+
+
+    private int getNumberOfBooksToGroup(Map<String, Integer> bookQuantityMap, Integer numberOfBooksToGroup) {
+        return numberOfBooksToGroup < bookQuantityMap.size() ? numberOfBooksToGroup : bookQuantityMap.size();
+    }
+    private Map<String, Integer> duplicateMap(Map<String, Integer> bookQuantityMap) {
+
+        return bookQuantityMap.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (firstKey, secondKey) -> secondKey, LinkedHashMap::new));
     }
 
     public void validateAllBooks(List<BookDto> listOfBooks) {
@@ -101,6 +134,10 @@ public class PriceSummationServiceImpl implements PriceSummationService {
 
     }
 
+    public List<Integer> getPossibleDiscountValues(int numberOfBooks) {
+
+        return Arrays.stream(DiscountDetails.values()).sorted(Comparator.reverseOrder()).filter(discountGroup -> discountGroup.getNumberOfDistinctItems() <= numberOfBooks).map(DiscountDetails::getNumberOfDistinctItems).collect(Collectors.toList());
+    }
     private Map<String, Double> getValidBooks() {
         return Arrays.stream(BookDevelopmentStackDetails.values())
                 .collect(Collectors.toMap(BookDevelopmentStackDetails::getBookTitle, BookDevelopmentStackDetails::getPrice));
