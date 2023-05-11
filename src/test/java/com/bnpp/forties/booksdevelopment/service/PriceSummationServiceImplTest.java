@@ -1,5 +1,6 @@
 package com.bnpp.forties.booksdevelopment.service;
 
+import com.bnpp.forties.booksdevelopment.exception.InvalidBookException;
 import com.bnpp.forties.booksdevelopment.model.BookDto;
 import com.bnpp.forties.booksdevelopment.model.CartSummaryReportDto;
 import com.bnpp.forties.booksdevelopment.service.impl.PriceSummationServiceImpl;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class PriceSummationServiceImplTest {
@@ -275,6 +277,18 @@ public class PriceSummationServiceImplTest {
         assertEquals(expectedDiscountPrice, cartSummaryReportDto.getTotalDiscount());
         assertEquals(expectedResultSixBooksWithFiveDistinctBooks, cartSummaryReportDto.getBestPrice());
     }
+    @Test
+    @DisplayName("calculate price summary should throw book not found exception for the invalid books")
+    void getCartSummary_shouldThrowInvalidExceptionOnInvalidBooks() {
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Davince Code", 2);
+        BookDto bookDto2 = new BookDto("Pirates", 1);
 
 
+        books.add(bookDto1);
+        books.add(bookDto2);
+
+
+        assertThrows(InvalidBookException.class, () -> priceSummationServiceImpl.getcartSummaryReport(books));
+    }
 }

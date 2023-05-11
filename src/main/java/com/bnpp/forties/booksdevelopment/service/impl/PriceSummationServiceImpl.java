@@ -1,11 +1,13 @@
 package com.bnpp.forties.booksdevelopment.service.impl;
 
+import com.bnpp.forties.booksdevelopment.exception.InvalidBookException;
 import com.bnpp.forties.booksdevelopment.model.BookDto;
 import com.bnpp.forties.booksdevelopment.model.BookGroupClassification;
 import com.bnpp.forties.booksdevelopment.model.CartSummaryReportDto;
 import com.bnpp.forties.booksdevelopment.service.PriceSummationService;
 import com.bnpp.forties.booksdevelopment.storerepository.BookDevelopmentStackDetails;
 import com.bnpp.forties.booksdevelopment.storerepository.DiscountDetails;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +27,7 @@ public class PriceSummationServiceImpl implements PriceSummationService {
 
     @Override
     public CartSummaryReportDto getcartSummaryReport(List<BookDto> books) {
+        validateAllBooks(books);
         Map<String, Integer> listOfBooksWithQuantityMap = books.stream()
                 .collect(Collectors.toMap(BookDto::getName, BookDto::getQuantity));
         List<BookGroupClassification> listOfBookGroup = getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, new ArrayList<>());
@@ -52,6 +55,14 @@ public class PriceSummationServiceImpl implements PriceSummationService {
             getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, bookGroupClassificationList);
         }
         return bookGroupClassificationList;
+    }
+
+    public void validateAllBooks(List<BookDto> listOfBooks) {
+        Map<String, Double> validBooks = getBookIdPriceMap(); //
+        List<String> invalidBooks = listOfBooks.stream().filter(book -> !validBooks.containsKey(book.getName())).map(BookDto::getName).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(invalidBooks)) {
+            throw new InvalidBookException(invalidBooks);
+        }
     }
     private Optional<DiscountDetails> getDiscount(int numberOfBooks) {
 
