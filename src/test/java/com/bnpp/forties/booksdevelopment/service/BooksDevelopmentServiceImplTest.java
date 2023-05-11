@@ -2,8 +2,11 @@ package com.bnpp.forties.booksdevelopment.service;
 
 import com.bnpp.forties.booksdevelopment.model.Book;
 import com.bnpp.forties.booksdevelopment.service.impl.BooksDevelopmentServiceImpl;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.hamcrest.CoreMatchers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -20,9 +23,9 @@ class BooksDevelopmentServiceImplTest {
 
     @Test
     @DisplayName("Get All Books should return five  books")
-    void getAllBooks_ShouldReturn_AllFiveBooks() {
+    void getAllBooksShouldReturnAllFiveBooks() {
         List<Book> books = booksDevelopmentServiceImpl.getAllBooks();
 
-        assertEquals(TOTAL_NUMBER_OF_BOOKS, books.size(), "All 5 Books are Received");
+        Assertions.assertThat(TOTAL_NUMBER_OF_BOOKS).isEqualTo(books.size());
     }
 }

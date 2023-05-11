@@ -4,6 +4,7 @@ import com.bnpp.forties.booksdevelopment.exception.InvalidBookException;
 import com.bnpp.forties.booksdevelopment.model.BookDto;
 import com.bnpp.forties.booksdevelopment.model.CartSummaryReportDto;
 import com.bnpp.forties.booksdevelopment.service.impl.PriceSummationServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,302 +22,296 @@ public class PriceSummationServiceImplTest {
     private static final String BOOK_NAME = "Clean Code";
     private static final double BOOK_PRICE = 50.00;
 
+    private static final int ONE = 1;
+    private static final int TWO = 2;
+
+    private static final int FIVE = 5;
+    private static final double TWO_DIFF_BOOK_EXPECTED_PRICE_WITH_2_PER_DISCOUNT = 95.00;
+    private static final double THREE_DIFF_BOOK_EXPECTED_PRICE_WITH_10_PER_DISCOUNT = 135.00;
+    private static final double FOUR_DIFF_BOOK_EXPECTED_PRICE_WITH_20_PER_DISCOUNT = 160.00;
+    private static final double FIVE_DIFF_BOOK_EXPECTED_PRICE_WITH_25_PER_DISCOUNT = 187.50;
+
+    private static final double TWO_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT = 145.00;
+    private static final double THREE_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT = 185.00;
+
+    private static final double FOUR_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT = 210.00;
+    private static final double FIVE_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT = 237.50;
+
+    private static final double SIX_BOOKS_WITH_FIVE_DISTINCT_BOOKS_DISCOUNT = 370.0;
+
+    private static final double SIX_BOOKS_WITH_FIVE_DISTINCT_BOOKS_ACTUAL_PRICE = 450.0;
+    private static final double SIX_BOOKS_WITH_FIVE_DISTINCT_BOOKS_DISCOUNT_AMOUNT = 80.0;
+
+    List<BookDto> listOfBooks;
 
 
     @Autowired
     private PriceSummationServiceImpl priceSummationServiceImpl;
 
+    @BeforeEach
+    void setup() {
+        listOfBooks = new ArrayList<BookDto>();
+    }
+
     @Test
     @DisplayName("50 should return for a single book")
-    void priceForABook_shouldReturnFifty() {
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto = new BookDto("Clean Code",1);
-        books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+    void singleBookPriceShouldReturnFifty() {
+
+        BookDto bookDto = new BookDto("Clean Code", ONE);
+
+        listOfBooks.add(bookDto);
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
 
         assertEquals(BOOK_PRICE, actualPrice);
     }
 
     @Test
-    @DisplayName("100 should return for a two book")
-    void priceForTwoBooks_shouldReturnHundrad() {
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto = new BookDto("Clean Code",2);
-        books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+    @DisplayName("100 should return for two listOfBooks")
+    void twoBooksShouldReturnPriceHundred() {
+        BookDto bookDto = new BookDto("Clean Code", TWO);
 
-        assertEquals(2*BOOK_PRICE, actualPrice);
+        listOfBooks.add(bookDto);
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+        assertEquals(2 * BOOK_PRICE, actualPrice);
     }
+
     @Test
     @DisplayName("250 should return for a Five book")
-    void priceForFiveBooks_shouldReturnTwoHundradAndFivty() {
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto = new BookDto("Clean Code",5);
-        books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+    void fiveBooksShouldReturnPriceTwoHundredAndFifty() {
+        BookDto bookDto = new BookDto("Clean Code", FIVE);
 
-        assertEquals(5*BOOK_PRICE, actualPrice);
+        listOfBooks.add(bookDto);
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+
+        assertEquals(5 * BOOK_PRICE, actualPrice);
     }
 
     @Test
-    @DisplayName("Two different books should get 5% discount")
-    void priceForTwoDifferentBooks_shouldReturnNintyFive() {
-        double expectedPrice = 95.00;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",1);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        books.add(bookDto1);
-        books.add(bookDto2);
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+    @DisplayName("Two different listOfBooks should get 5% discount")
+    void twoDifferentBooksShouldReturnPriceNinetyFive() {
 
-        assertEquals(expectedPrice, actualPrice);
+
+        BookDto firstBook = new BookDto("Clean Code", ONE);
+        BookDto secondBook = new BookDto("The Clean Coder", ONE);
+
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+
+        assertEquals(TWO_DIFF_BOOK_EXPECTED_PRICE_WITH_2_PER_DISCOUNT, actualPrice);
     }
 
     @Test
-    @DisplayName("Three different books should get 10% discount")
-    void priceForThreeDifferentBooks_shouldReturnOneHundradAndThirtyFive() {
-        double expectedPrice = 135.00;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",1);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",1);
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+    @DisplayName("Three different listOfBooks should get 10% discount")
+    void threeDifferentBooksShouldReturnOneHundredAndThirtyFive() {
 
-        assertEquals(expectedPrice, actualPrice);
+
+        BookDto firstBook = new BookDto("Clean Code", ONE);
+        BookDto secondBook = new BookDto("The Clean Coder", ONE);
+        BookDto thirdBook = new BookDto("Clean Architecture", ONE);
+
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+
+        assertEquals(THREE_DIFF_BOOK_EXPECTED_PRICE_WITH_10_PER_DISCOUNT, actualPrice);
     }
 
     @Test
-    @DisplayName("Four different books should get 10% discount")
-    void priceForFourDifferentBooks_shouldReturnOneHundradAndSixty() {
-        double expectedPrice = 160.00;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",1);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",1);
-        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        books.add(bookDto4);
+    @DisplayName("Four different listOfBooks should get 10% discount")
+    void fourDifferentBooksShouldReturnOneHundredAndSixty() {
 
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
 
-        assertEquals(expectedPrice, actualPrice);
+        BookDto firstBook = new BookDto("Clean Code", 1);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
+        BookDto thirdBook = new BookDto("Clean Architecture", 1);
+        BookDto fourthBook = new BookDto("Test-Driven Development By Example", 1);
+
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
+        listOfBooks.add(fourthBook);
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+        ;
+
+        assertEquals(FOUR_DIFF_BOOK_EXPECTED_PRICE_WITH_20_PER_DISCOUNT, actualPrice);
     }
 
     @Test
-    @DisplayName("Five different books should get 10% discount")
-    void priceForFiveDifferentBooks_shouldReturnOneHundradAndEightySeven() {
-        double expectedPrice = 187.50;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",1);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",1);
-        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
-        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
+    @DisplayName("Five different listOfBooks should get 10% discount")
+    void fiveDifferentBooksShouldReturnPriceOneHundredAndEightySeven() {
 
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        books.add(bookDto4);
-        books.add(bookDto5);
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
 
-        assertEquals(expectedPrice, actualPrice);
+        BookDto firstBook = new BookDto("Clean Code", 1);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
+        BookDto thirdBook = new BookDto("Clean Architecture", 1);
+        BookDto fourthBook = new BookDto("Test-Driven Development By Example", 1);
+        BookDto fifthBook = new BookDto("Working Effectively With Legacy Code", 1);
+
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
+        listOfBooks.add(fourthBook);
+        listOfBooks.add(fifthBook);
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+
+        assertEquals(FIVE_DIFF_BOOK_EXPECTED_PRICE_WITH_25_PER_DISCOUNT, actualPrice);
     }
 
     @Test
-    @DisplayName("two distinct books should only get 5% discount")
-    void calculatePrice_shouldApplyFivePercentDiscountOnlyForTwoDistinctBooks() {
-        Double expectedResultThreeBooksWithTwoDistinctBooks = 145.00;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",2);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-
-        books.add(bookDto1);
-        books.add(bookDto2);
+    @DisplayName("two distinct listOfBooks should only get 5% discount")
+    void fivePercentDiscountOnlyForTwoDistinctBooksShouldApply() {
 
 
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+        BookDto firstBook = new BookDto("Clean Code", 2);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
 
-        assertEquals(expectedResultThreeBooksWithTwoDistinctBooks, actualPrice);
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+        ;
+
+        assertEquals(TWO_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT, actualPrice);
     }
 
     @Test
-    @DisplayName("three distinct books should only get 10% discount")
-    void calculatePrice_shouldApplyTenPercentDiscountOnlyForThreeDistinctBooks() {
-        Double expectedResultFourBooksWithThreeDistinctBooks = 185.00;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",2);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",1);
+    @DisplayName("three distinct listOfBooks should only get 10% discount")
+    void tenPercentDiscountOnlyForThreeDistinctBooks() {
+
+        BookDto firstBook = new BookDto("Clean Code", 2);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
+        BookDto thirdBook = new BookDto("Clean Architecture", 1);
 
 
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
 
 
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
 
-        assertEquals(expectedResultFourBooksWithThreeDistinctBooks, actualPrice);
+        assertEquals(THREE_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT, actualPrice);
     }
 
     @Test
-    @DisplayName("Four distinct books should only get 20% discount")
-    void calculatePrice_shouldApplyTwentyPercentDiscountOnlyForFourDistinctBooks() {
-        Double expectedResultFiveBooksWithFourDistinctBooks = 210.00;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",2);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",1);
-        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
+    @DisplayName("Four distinct listOfBooks should only get 20% discount")
+    void twentyPercentDiscountOnlyForFourDistinctBooks() {
 
 
+        BookDto firstBook = new BookDto("Clean Code", 2);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
+        BookDto thirdBook = new BookDto("Clean Architecture", 1);
+        BookDto fourthBook = new BookDto("Test-Driven Development By Example", 1);
 
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        books.add(bookDto4);
+
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
+        listOfBooks.add(fourthBook);
 
 
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+        ;
 
-        assertEquals(expectedResultFiveBooksWithFourDistinctBooks, actualPrice);
+        assertEquals(FOUR_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT, actualPrice);
     }
 
 
     @Test
-    @DisplayName("Five distinct books should only get 25% discount")
-    void calculatePrice_shouldApplyTwentyFivePercentDiscountOnlyForFiveDistinctBooks() {
-        Double expectedResultSixBooksWithFiveDistinctBooks = 237.50;
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Clean Code",2);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",1);
-        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
-        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
+    @DisplayName("Five distinct listOfBooks should only get 25% discount")
+    void twentyFivePercentDiscountOnlyForFiveDistinctBooks() {
+
+        BookDto firstBook = new BookDto("Clean Code", 2);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
+        BookDto thirdBook = new BookDto("Clean Architecture", 1);
+        BookDto fourthBook = new BookDto("Test-Driven Development By Example", 1);
+        BookDto fifthBook = new BookDto("Working Effectively With Legacy Code", 1);
 
 
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
+        listOfBooks.add(fourthBook);
+        listOfBooks.add(fifthBook);
 
 
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        books.add(bookDto4);
-        books.add(bookDto5);
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+        ;
 
-
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
-;
-
-        assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
+        assertEquals(FIVE_DISTINCT_AND_ONE_SEPARATE_BOOK_WITH_DISCOUNT, actualPrice);
     }
 
     @Test
-    @DisplayName("apply discount to all distinct books only ")
-    void calculatePrice_shouldApplyDiscountToAllDistinctBooks() {
-        List<BookDto> books = new ArrayList<BookDto>();
-        Double expectedResultSixBooksWithFiveDistinctBooks = 370.0;
-
-        BookDto bookDto1 = new BookDto("Clean Code",2);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",3);
-        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",2);
-        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
-
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        books.add(bookDto4);
-        books.add(bookDto5);
+    @DisplayName("apply discount to all distinct listOfBooks only ")
+    void ApplyDiscountToAllDistinctBooks() {
 
 
-        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(books).getBestPrice();
+        BookDto firstBook = new BookDto("Clean Code", 2);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
+        BookDto thirdBook = new BookDto("Clean Architecture", 3);
+        BookDto fourthBook = new BookDto("Test-Driven Development By Example", 2);
+        BookDto fifthBook = new BookDto("Working Effectively With Legacy Code", 1);
 
-        assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
+        listOfBooks.add(fourthBook);
+        listOfBooks.add(fifthBook);
+
+
+        Double actualPrice = priceSummationServiceImpl.getcartSummaryReport(listOfBooks).getCostEffectivePrice();
+
+        assertEquals(SIX_BOOKS_WITH_FIVE_DISTINCT_BOOKS_DISCOUNT, actualPrice);
     }
 
     @Test
     @DisplayName("calculate price should return detailed price summary")
-    void calculatePrice_shouldReturnCartSummaryReport() {
-        List<BookDto> books = new ArrayList<BookDto>();
-        Double expectedActualPrice = 450.0;
-        Double expectedDiscountPrice = 80.0;
-        Double expectedResultSixBooksWithFiveDistinctBooks = 370.0;
-
-        BookDto bookDto1 = new BookDto("Clean Code",2);
-        BookDto bookDto2 = new BookDto("The Clean Coder",1);
-        BookDto bookDto3 = new BookDto("Clean Architecture",3);
-        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",2);
-        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
-
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        books.add(bookDto4);
-        books.add(bookDto5);
+    void cartSummaryReportTesting() {
 
 
-        CartSummaryReportDto cartSummaryReportDto = priceSummationServiceImpl.getcartSummaryReport(books);
+        BookDto firstBook = new BookDto("Clean Code", 2);
+        BookDto secondBook = new BookDto("The Clean Coder", 1);
+        BookDto thirdBook = new BookDto("Clean Architecture", 3);
+        BookDto fourthBook = new BookDto("Test-Driven Development By Example", 2);
+        BookDto fifthBook = new BookDto("Working Effectively With Legacy Code", 1);
 
-        assertEquals(expectedActualPrice, cartSummaryReportDto.getActualPrice());
-        assertEquals(expectedDiscountPrice, cartSummaryReportDto.getTotalDiscount());
-        assertEquals(expectedResultSixBooksWithFiveDistinctBooks, cartSummaryReportDto.getBestPrice());
-    }
-    @Test
-    @DisplayName("calculate price summary should throw book not found exception for the invalid books")
-    void getCartSummary_shouldThrowInvalidExceptionOnInvalidBooks() {
-        List<BookDto> books = new ArrayList<BookDto>();
-        BookDto bookDto1 = new BookDto("Davince Code", 2);
-        BookDto bookDto2 = new BookDto("Pirates", 1);
-
-
-        books.add(bookDto1);
-        books.add(bookDto2);
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
+        listOfBooks.add(thirdBook);
+        listOfBooks.add(fourthBook);
+        listOfBooks.add(fifthBook);
 
 
-        assertThrows(InvalidBookException.class, () -> priceSummationServiceImpl.getcartSummaryReport(books));
+        CartSummaryReportDto cartSummaryReportDto = priceSummationServiceImpl.getcartSummaryReport(listOfBooks);
+
+        assertEquals(SIX_BOOKS_WITH_FIVE_DISTINCT_BOOKS_ACTUAL_PRICE, cartSummaryReportDto.getActualPrice());
+        assertEquals(SIX_BOOKS_WITH_FIVE_DISTINCT_BOOKS_DISCOUNT_AMOUNT, cartSummaryReportDto.getTotalDiscount());
+        assertEquals(SIX_BOOKS_WITH_FIVE_DISTINCT_BOOKS_DISCOUNT, cartSummaryReportDto.getCostEffectivePrice());
     }
 
     @Test
-    @DisplayName("calculate price summary should return price summary with the best discount")
-    void calculatePrice_shouldReturnPriceSummaryWithBestDiscount() {
-        List<BookDto> books = new ArrayList<BookDto>();
-        Double expectedActualPrice = 400.0;
-        Double expectedDiscountPrice = 80.0;
-        Double expectedResultNineBooksWithFiveDistinctBooks = 320.0;
+    @DisplayName("calculate price summary should throw book not found exception for the invalid listOfBooks")
+    void getCartSummaryshouldThrowInvalidExceptionOnInvalidBooks() {
 
-        BookDto bookDto1 = new BookDto("Clean Code",2);
-        BookDto bookDto2 = new BookDto("The Clean Coder",2);
-        BookDto bookDto3 = new BookDto("Clean Architecture",2);
-        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
-        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
-
-        books.add(bookDto1);
-        books.add(bookDto2);
-        books.add(bookDto3);
-        books.add(bookDto4);
-        books.add(bookDto5);
+        BookDto firstBook = new BookDto("Davince Code", 2);
+        BookDto secondBook = new BookDto("Pirates", 1);
 
 
-        CartSummaryReportDto cartSummaryReportDto = priceSummationServiceImpl.getcartSummaryReport(books);
+        listOfBooks.add(firstBook);
+        listOfBooks.add(secondBook);
 
-        assertEquals(expectedActualPrice, cartSummaryReportDto.getActualPrice());
-        assertEquals(expectedDiscountPrice, cartSummaryReportDto.getTotalDiscount());
-        assertEquals(expectedResultNineBooksWithFiveDistinctBooks, cartSummaryReportDto.getBestPrice());
+
+        assertThrows(InvalidBookException.class, () -> priceSummationServiceImpl.getcartSummaryReport(listOfBooks));
     }
+
 }

@@ -1,13 +1,15 @@
 package com.bnpp.forties.booksdevelopment.service.impl;
 
 import com.bnpp.forties.booksdevelopment.exception.InvalidBookException;
+import com.bnpp.forties.booksdevelopment.exception.InvalidQuantityException;
 import com.bnpp.forties.booksdevelopment.model.BookDto;
 import com.bnpp.forties.booksdevelopment.model.BookGroupClassification;
 import com.bnpp.forties.booksdevelopment.model.CartSummaryReportDto;
 import com.bnpp.forties.booksdevelopment.service.PriceSummationService;
-import com.bnpp.forties.booksdevelopment.storerepository.BookDevelopmentStackDetails;
-import com.bnpp.forties.booksdevelopment.storerepository.DiscountDetails;
+import com.bnpp.forties.booksdevelopment.storerepository.BookStoreEnum;
+import com.bnpp.forties.booksdevelopment.storerepository.DiscountDetailsEnum;
 import com.bnpp.forties.booksdevelopment.utils.Constants;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +19,6 @@ import java.util.stream.Collectors;
 @Service
 public class PriceSummationServiceImpl implements PriceSummationService {
 
-
-
-    
 
     @Override
     public CartSummaryReportDto getcartSummaryReport(List<BookDto> listOfBooks) {
@@ -57,21 +56,22 @@ public class PriceSummationServiceImpl implements PriceSummationService {
     }
 
     private void updateBestDiscount(CartSummaryReportDto priceSummaryDto, List<BookGroupClassification> listOfBookGroupClassification) {
-        double discount = listOfBookGroupClassification.stream().mapToDouble(BookGroupClassification::getDiscount).sum();
+        double discount = listOfBookGroupClassification.stream().mapToDouble(BookGroupClassification::getDiscountAmount).sum();
         if (discount >= priceSummaryDto.getTotalDiscount()) {
             priceSummaryDto.setListOfBookGroupClassifications(listOfBookGroupClassification);
             double actualPrice = listOfBookGroupClassification.stream().mapToDouble(BookGroupClassification::getActualPrice).sum();
             priceSummaryDto.setActualPrice(actualPrice);
             priceSummaryDto.setTotalDiscount(discount);
-            priceSummaryDto.setBestPrice(actualPrice - discount);
+            priceSummaryDto.setCostEffectivePrice(actualPrice - discount);
         }
     }
+
     private List<BookGroupClassification> getListOfBookGroupWithDiscount(Map<String, Integer> listOfBooksWithQuantityMap,
-                                                                     List<BookGroupClassification> bookGroupClassificationList, int numberOfBooksToGroup) {
+                                                                         List<BookGroupClassification> bookGroupClassificationList, int numberOfBooksToGroup) {
 
 
         numberOfBooksToGroup = getNumberOfBooksToGroup(listOfBooksWithQuantityMap, numberOfBooksToGroup);
-        Optional<DiscountDetails> discount = getDiscount(numberOfBooksToGroup);
+        Optional<DiscountDetailsEnum> discount = getDiscount(numberOfBooksToGroup);
         if (discount.isPresent()) {
             int bookGroupSize = discount.get().getNumberOfDistinctItems();
             List<String> listOfDistinctBooks = listOfBooksWithQuantityMap.keySet().stream().limit(bookGroupSize)
@@ -79,7 +79,7 @@ public class PriceSummationServiceImpl implements PriceSummationService {
             BookGroupClassification currentBookGroup = getBookGroup(listOfDistinctBooks);
             bookGroupClassificationList.add(currentBookGroup);
             removeDiscountedBooks(listOfBooksWithQuantityMap, listOfDistinctBooks);
-            getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, bookGroupClassificationList,numberOfBooksToGroup);
+            getListOfBookGroupWithDiscount(listOfBooksWithQuantityMap, bookGroupClassificationList, numberOfBooksToGroup);
         }
         return bookGroupClassificationList;
     }
@@ -88,6 +88,7 @@ public class PriceSummationServiceImpl implements PriceSummationService {
     private int getNumberOfBooksToGroup(Map<String, Integer> bookQuantityMap, Integer numberOfBooksToGroup) {
         return numberOfBooksToGroup < bookQuantityMap.size() ? numberOfBooksToGroup : bookQuantityMap.size();
     }
+
     private Map<String, Integer> duplicateMap(Map<String, Integer> bookQuantityMap) {
 
         return bookQuantityMap.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (firstKey, secondKey) -> secondKey, LinkedHashMap::new));
@@ -99,19 +100,25 @@ public class PriceSummationServiceImpl implements PriceSummationService {
         if (CollectionUtils.isNotEmpty(invalidBooks)) {
             throw new InvalidBookException(invalidBooks);
         }
-    }
-    private Optional<DiscountDetails> getDiscount(int numberOfBooks) {
+        List<Integer> invalidQuantities = listOfBooks.stream().filter(book -> book.getQuantity() <= 0).map(BookDto::getQuantity).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(invalidQuantities)) {
+            throw new InvalidQuantityException(invalidQuantities);
+        }
 
-        return Arrays.stream(DiscountDetails.values()).filter(discountGroup -> discountGroup.getNumberOfDistinctItems() == numberOfBooks).findFirst();
     }
 
-    private BookGroupClassification  getListOfBookGroupWithoutDiscount(Map<String, Integer> listOfBooksWithQuantityMap) {
+    private Optional<DiscountDetailsEnum> getDiscount(int numberOfBooks) {
+
+        return Arrays.stream(DiscountDetailsEnum.values()).filter(discountGroup -> discountGroup.getNumberOfDistinctItems() == numberOfBooks).findFirst();
+    }
+
+    private BookGroupClassification getListOfBookGroupWithoutDiscount(Map<String, Integer> listOfBooksWithQuantityMap) {
         Map<String, Double> bookIdPriceMap = getValidBooks();
         Set<String> bookTitles = listOfBooksWithQuantityMap.keySet();
         double actualPrice = bookTitles.stream()
                 .mapToDouble(bookId -> bookIdPriceMap.get(bookId) * listOfBooksWithQuantityMap.get(bookId)).sum();
         int numberOfBooks = listOfBooksWithQuantityMap.values().stream().mapToInt(Integer::intValue).sum();
-        return new BookGroupClassification( Constants.ZERO_PERCENT,  actualPrice, Constants.NO_DISCOUNT, numberOfBooks);
+        return new BookGroupClassification( new ArrayList<>(listOfBooksWithQuantityMap.keySet()),Constants.ZERO_PERCENT, actualPrice, Constants.NO_DISCOUNT, numberOfBooks);
     }
 
     private void removeDiscountedBooks(Map<String, Integer> listOfBooksWithQuantityMap, List<String> discountedBooks) {
@@ -126,27 +133,28 @@ public class PriceSummationServiceImpl implements PriceSummationService {
     }
 
 
-
     private BookGroupClassification getBookGroup(List<String> listOfBookToGroup) {
         Map<String, Double> bookIdPriceMap = getValidBooks();
         double actualPrice = listOfBookToGroup.stream().mapToDouble(bookId -> bookIdPriceMap.get(bookId) * Constants.ONE_QUANTITY)
                 .sum();
         int discountPercentage = getDiscountPercentage(listOfBookToGroup.size());
         double discount = (actualPrice * discountPercentage) / Constants.HUNDRED;
-        return new BookGroupClassification(discountPercentage, actualPrice, discount,listOfBookToGroup.size());
+        return new BookGroupClassification(listOfBookToGroup,discountPercentage, actualPrice, discount, listOfBookToGroup.size());
 
     }
 
     public List<Integer> getPossibleDiscountValues(int numberOfBooks) {
+        return Arrays.stream(DiscountDetailsEnum.values()).sorted(Comparator.reverseOrder()).filter(discountGroup -> discountGroup.getNumberOfDistinctItems() <= numberOfBooks).map(DiscountDetailsEnum::getNumberOfDistinctItems).collect(Collectors.toList());
 
-        return Arrays.stream(DiscountDetails.values()).sorted(Comparator.reverseOrder()).filter(discountGroup -> discountGroup.getNumberOfDistinctItems() <= numberOfBooks).map(DiscountDetails::getNumberOfDistinctItems).collect(Collectors.toList());
     }
+
     private Map<String, Double> getValidBooks() {
-        return Arrays.stream(BookDevelopmentStackDetails.values())
-                .collect(Collectors.toMap(BookDevelopmentStackDetails::getBookTitle, BookDevelopmentStackDetails::getPrice));
+        return Arrays.stream(BookStoreEnum.values())
+                .collect(Collectors.toMap(BookStoreEnum::getBookTitle, BookStoreEnum::getPrice));
     }
+
     private int getDiscountPercentage(int numberOfDistinctBooks) {
-        Optional<DiscountDetails> discount = getDiscount(numberOfDistinctBooks);
+        Optional<DiscountDetailsEnum> discount = getDiscount(numberOfDistinctBooks);
         return (discount.isPresent()) ? discount.get().getDiscountPercentage() : Constants.ZERO_PERCENT;
     }
 }

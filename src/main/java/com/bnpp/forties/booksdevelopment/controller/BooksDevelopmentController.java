@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = BooksDevelopmentController.APIRoutes.BooksController.ROOT_API)
+@RequestMapping("${developmentbooks.controller.path}")
 @RequiredArgsConstructor
 public class BooksDevelopmentController {
 
@@ -31,7 +31,7 @@ public class BooksDevelopmentController {
             @ApiResponse(code = 200, message = "Success|OK"),
             @ApiResponse(code = 403, message = "forbidden!!!"),
             @ApiResponse(code = 404, message = "not found!!!")})
-    @GetMapping(value = APIRoutes.BooksController.GET_ALL_BOOKS)
+    @GetMapping("${developmentbooks.endpoints.getallbooks}")
     public List<Book> getAllBooks() {
         return booksDevelopmentService.getAllBooks();
     }
@@ -44,18 +44,10 @@ public class BooksDevelopmentController {
             @ApiResponse(code = 404, message = "not found!!!")
     })
 
-    @PostMapping(value= APIRoutes.BooksController.CALCULATE_DISCOUNT_PRICE)
+    @PostMapping("${developmentbooks.endpoints.calculatediscountprice}")
     public CartSummaryReportDto calculateDiscountPrice(@RequestBody List<BookDto> listOfBooks) {
         return priceSummationService.getcartSummaryReport(listOfBooks);
     }
-    public class APIRoutes {
-
-        public class BooksController {
-            public static final String ROOT_API = "/api/booksdevelopment";
-            public static final String GET_ALL_BOOKS = "/getallbooks";
-            public static final String CALCULATE_DISCOUNT_PRICE = "/calculatediscountprice";
-        }
-    }
-
+    
 }
 

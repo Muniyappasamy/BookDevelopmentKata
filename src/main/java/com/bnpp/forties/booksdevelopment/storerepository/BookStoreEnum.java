@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum BookDevelopmentStackDetails {
+public enum BookStoreEnum {
 
     CLEAN_CODE("Clean Code", "Robert Martin", 50.00),
     THE_CLEAN_CODER("The Clean Coder", "Robert Martin", 50.00),
