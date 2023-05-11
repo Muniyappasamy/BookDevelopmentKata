@@ -135,11 +135,81 @@ public class PriceSummationServiceImplTest {
 
         books.add(bookDto1);
         books.add(bookDto2);
-        
+
 
         Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
 
         assertEquals(expectedResultThreeBooksWithTwoDistinctBooks, actualPrice);
+    }
+
+    @Test
+    @DisplayName("three distinct books should only get 10% discount")
+    void calculatePrice_shouldApplyTenPercentDiscountOnlyForThreeDistinctBooks() {
+        Double expectedResultFourBooksWithThreeDistinctBooks = 185.00;
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Clean Code",2);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",1);
+
+
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+
+
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedResultFourBooksWithThreeDistinctBooks, actualPrice);
+    }
+
+    @Test
+    @DisplayName("Four distinct books should only get 20% discount")
+    void calculatePrice_shouldApplyTwentyPercentDiscountOnlyForFourDistinctBooks() {
+        Double expectedResultFiveBooksWithFourDistinctBooks = 210.00;
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Clean Code",2);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",1);
+        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
+
+
+
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+        books.add(bookDto4);
+
+
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedResultFiveBooksWithFourDistinctBooks, actualPrice);
+    }
+
+
+    @Test
+    @DisplayName("Five distinct books should only get 25% discount")
+    void calculatePrice_shouldApplyTwentyFivePercentDiscountOnlyForFiveDistinctBooks() {
+        Double expectedResultSixBooksWithFiveDistinctBooks = 237.50;
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Clean Code",2);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",1);
+        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",1);
+        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
+
+
+
+
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+        books.add(bookDto4);
+        books.add(bookDto5);
+
+
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
     }
 
 
