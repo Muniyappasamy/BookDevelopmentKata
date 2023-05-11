@@ -212,5 +212,29 @@ public class PriceSummationServiceImplTest {
         assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
     }
 
+    @Test
+    @DisplayName("apply discount to all distinct books only ")
+    void calculatePrice_shouldApplyDiscountToAllDistinctBooks() {
+        List<BookDto> books = new ArrayList<BookDto>();
+        Double expectedResultSixBooksWithFiveDistinctBooks = 387.5;
+
+        BookDto bookDto1 = new BookDto("Clean Code",2);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",3);
+        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",2);
+        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
+
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+        books.add(bookDto4);
+        books.add(bookDto5);
+
+
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
+    }
+
 
 }
