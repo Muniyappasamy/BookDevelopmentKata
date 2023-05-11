@@ -2,6 +2,7 @@ package com.bnpp.forties.booksdevelopment.service.impl;
 
 import com.bnpp.forties.booksdevelopment.model.BookDto;
 import com.bnpp.forties.booksdevelopment.model.BookGroupClassification;
+import com.bnpp.forties.booksdevelopment.model.CartSummaryReportDto;
 import com.bnpp.forties.booksdevelopment.service.PriceSummationService;
 import com.bnpp.forties.booksdevelopment.storerepository.BookDevelopmentStackDetails;
 import com.bnpp.forties.booksdevelopment.storerepository.DiscountDetails;
@@ -23,7 +24,7 @@ public class PriceSummationServiceImpl implements PriceSummationService {
     private static final int HUNDRED = 100;
 
     @Override
-    public Double calculatePrice(List<BookDto> books) {
+    public CartSummaryReportDto calculatePrice(List<BookDto> books) {
         Map<String, Integer> listOfBooksWithQuantityMap = books.stream()
                 .collect(Collectors.toMap(BookDto::getName, BookDto::getQuantity));
         List<BookGroupClassification> listOfBookGroup = getListOfBookGroupDiscount(listOfBooksWithQuantityMap, new ArrayList<>());
@@ -31,7 +32,12 @@ public class PriceSummationServiceImpl implements PriceSummationService {
         listOfBookGroup.add(booksWithoutDiscount);
         double actualPrice = listOfBookGroup.stream().mapToDouble(BookGroupClassification::getActualPrice).sum();
         double discount = listOfBookGroup.stream().mapToDouble(BookGroupClassification::getDiscount).sum();
-        return (actualPrice - discount);
+        CartSummaryReportDto cartSummaryReportDto = new CartSummaryReportDto();
+        cartSummaryReportDto.setListOfBookGroupClassifications(listOfBookGroup);
+        cartSummaryReportDto.setActualPrice(actualPrice);
+        cartSummaryReportDto.setTotalDiscount(discount);
+        cartSummaryReportDto.setBestPrice(actualPrice - discount);
+        return cartSummaryReportDto;
     }
     private List<BookGroupClassification> getListOfBookGroupDiscount(Map<String, Integer> listOfBooksWithQuantityMap,
                                                                      List<BookGroupClassification> bookGroupClassificationList) {

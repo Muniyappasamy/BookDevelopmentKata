@@ -1,6 +1,7 @@
 package com.bnpp.forties.booksdevelopment.service;
 
 import com.bnpp.forties.booksdevelopment.model.BookDto;
+import com.bnpp.forties.booksdevelopment.model.CartSummaryReportDto;
 import com.bnpp.forties.booksdevelopment.service.impl.PriceSummationServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,8 @@ public class PriceSummationServiceImplTest {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",1);
         books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(BOOK_PRICE, actualPrice);
     }
@@ -40,7 +42,8 @@ public class PriceSummationServiceImplTest {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",2);
         books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(2*BOOK_PRICE, actualPrice);
     }
@@ -50,7 +53,8 @@ public class PriceSummationServiceImplTest {
         List<BookDto> books = new ArrayList<BookDto>();
         BookDto bookDto = new BookDto("Clean Code",5);
         books.add(bookDto);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(5*BOOK_PRICE, actualPrice);
     }
@@ -64,7 +68,8 @@ public class PriceSummationServiceImplTest {
         BookDto bookDto2 = new BookDto("The Clean Coder",1);
         books.add(bookDto1);
         books.add(bookDto2);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedPrice, actualPrice);
     }
@@ -80,7 +85,8 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto1);
         books.add(bookDto2);
         books.add(bookDto3);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedPrice, actualPrice);
     }
@@ -99,7 +105,8 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto3);
         books.add(bookDto4);
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedPrice, actualPrice);
     }
@@ -120,7 +127,8 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto3);
         books.add(bookDto4);
         books.add(bookDto5);
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedPrice, actualPrice);
     }
@@ -137,7 +145,8 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto2);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedResultThreeBooksWithTwoDistinctBooks, actualPrice);
     }
@@ -157,7 +166,8 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto3);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedResultFourBooksWithThreeDistinctBooks, actualPrice);
     }
@@ -180,7 +190,8 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto4);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedResultFiveBooksWithFourDistinctBooks, actualPrice);
     }
@@ -207,7 +218,8 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto5);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
+;
 
         assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
     }
@@ -231,9 +243,37 @@ public class PriceSummationServiceImplTest {
         books.add(bookDto5);
 
 
-        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books).getBestPrice();
 
         assertEquals(expectedResultSixBooksWithFiveDistinctBooks, actualPrice);
+    }
+
+    @Test
+    @DisplayName("calculate price should return detailed price summary")
+    void calculatePrice_shouldReturnCartSummaryReport() {
+        List<BookDto> books = new ArrayList<BookDto>();
+        Double expectedActualPrice = 450.0;
+        Double expectedDiscountPrice = 77.5;
+        Double expectedResultSixBooksWithFiveDistinctBooks = 372.5;
+
+        BookDto bookDto1 = new BookDto("Clean Code",2);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+        BookDto bookDto3 = new BookDto("Clean Architecture",3);
+        BookDto bookDto4 = new BookDto("Test-Driven Development By Example",2);
+        BookDto bookDto5 = new BookDto("Working Effectively With Legacy Code",1);
+
+        books.add(bookDto1);
+        books.add(bookDto2);
+        books.add(bookDto3);
+        books.add(bookDto4);
+        books.add(bookDto5);
+
+
+        CartSummaryReportDto cartSummaryReportDto = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedActualPrice, cartSummaryReportDto.getActualPrice());
+        assertEquals(expectedDiscountPrice, cartSummaryReportDto.getTotalDiscount());
+        assertEquals(expectedResultSixBooksWithFiveDistinctBooks, cartSummaryReportDto.getBestPrice());
     }
 
 
