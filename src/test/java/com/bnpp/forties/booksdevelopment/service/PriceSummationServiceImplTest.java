@@ -125,5 +125,22 @@ public class PriceSummationServiceImplTest {
         assertEquals(expectedPrice, actualPrice);
     }
 
+    @Test
+    @DisplayName("two distinct books should only get 5% discount")
+    void calculatePrice_shouldApplyFivePercentDiscountOnlyForTwoDistinctBooks() {
+        Double expectedResultThreeBooksWithTwoDistinctBooks = 145.00;
+        List<BookDto> books = new ArrayList<BookDto>();
+        BookDto bookDto1 = new BookDto("Clean Code",2);
+        BookDto bookDto2 = new BookDto("The Clean Coder",1);
+
+        books.add(bookDto1);
+        books.add(bookDto2);
+        
+
+        Double actualPrice = priceSummationServiceImpl.calculatePrice(books);
+
+        assertEquals(expectedResultThreeBooksWithTwoDistinctBooks, actualPrice);
+    }
+
 
 }
